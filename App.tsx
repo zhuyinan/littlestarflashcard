@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { AppMode } from './types';
 import { FlashcardMode } from './views/FlashcardMode';
 import { QuizMode } from './views/QuizMode';
@@ -11,6 +12,43 @@ import { LanguageProvider, useLanguage } from './i18n';
 
 const AppContent: React.FC = () => {
   const [mode, setMode] = useState<AppMode>(AppMode.Menu);
+
+  // Audio Unlocker for Mobile Browsers (especially WeChat/iOS)
+  useEffect(() => {
+    const unlockAudio = () => {
+      // 1. Prime Speech Synthesis
+      if ('speechSynthesis' in window) {
+        const emptyUtterance = new SpeechSynthesisUtterance('');
+        window.speechSynthesis.speak(emptyUtterance);
+      }
+      
+      // 2. Prime HTML Audio (create a silent buffer)
+      // This helps 'wake up' the audio context
+      const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+      if (AudioContext) {
+        const ctx = new AudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        gain.gain.value = 0; // Silent
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(0);
+        osc.stop(0.1);
+      }
+
+      // Remove listener after first interaction
+      document.removeEventListener('touchstart', unlockAudio);
+      document.removeEventListener('click', unlockAudio);
+    };
+
+    document.addEventListener('touchstart', unlockAudio);
+    document.addEventListener('click', unlockAudio);
+
+    return () => {
+      document.removeEventListener('touchstart', unlockAudio);
+      document.removeEventListener('click', unlockAudio);
+    };
+  }, []);
 
   const renderMode = () => {
     switch (mode) {
