@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { AppMode } from './types';
 import { FlashcardMode } from './views/FlashcardMode';
@@ -12,6 +11,36 @@ import { LanguageProvider, useLanguage } from './i18n';
 
 const AppContent: React.FC = () => {
   const [mode, setMode] = useState<AppMode>(AppMode.Menu);
+
+  // Handle Browser Back Button (History API)
+  useEffect(() => {
+    // Handler for popstate event (when back button is pressed)
+    const handlePopState = (event: PopStateEvent) => {
+      if (event.state && event.state.mode) {
+        setMode(event.state.mode);
+      } else {
+        // Fallback to menu if no state (e.g. initial load)
+        setMode(AppMode.Menu);
+      }
+    };
+
+    // Replace current state on load to ensure we have a base state
+    window.history.replaceState({ mode: AppMode.Menu }, '');
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  // Function to navigate to a mode with history push
+  const navigateTo = (newMode: AppMode) => {
+    window.history.pushState({ mode: newMode }, '');
+    setMode(newMode);
+  };
+
+  // Function to go back using history
+  const goBack = () => {
+    window.history.back();
+  };
 
   // Audio Unlocker for Mobile Browsers (especially WeChat/iOS)
   useEffect(() => {
@@ -53,19 +82,19 @@ const AppContent: React.FC = () => {
   const renderMode = () => {
     switch (mode) {
       case AppMode.Flashcards:
-        return <FlashcardMode onBack={() => setMode(AppMode.Menu)} />;
+        return <FlashcardMode onBack={goBack} />;
       case AppMode.Quiz:
-        return <QuizMode onBack={() => setMode(AppMode.Menu)} />;
+        return <QuizMode onBack={goBack} />;
       case AppMode.OddOneOut:
-        return <OddOneOutMode onBack={() => setMode(AppMode.Menu)} />;
+        return <OddOneOutMode onBack={goBack} />;
       case AppMode.SentenceBuilder:
-        return <SentenceBuilderMode onBack={() => setMode(AppMode.Menu)} />;
+        return <SentenceBuilderMode onBack={goBack} />;
       case AppMode.ListeningChallenge:
-        return <ListeningChallengeMode onBack={() => setMode(AppMode.Menu)} />;
+        return <ListeningChallengeMode onBack={goBack} />;
       case AppMode.SentenceChallenge:
-        return <SentenceChallengeMode onBack={() => setMode(AppMode.Menu)} />;
+        return <SentenceChallengeMode onBack={goBack} />;
       default:
-        return <MainMenu onSelect={setMode} />;
+        return <MainMenu onSelect={navigateTo} />;
     }
   };
 

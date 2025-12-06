@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { GameHeader } from '../components/GameHeader';
 import { VOCABULARY } from '../data';
 import { WordCard } from '../types';
@@ -18,6 +18,9 @@ export const ListeningChallengeMode: React.FC<ListeningChallengeModeProps> = ({ 
   const [gameWon, setGameWon] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false); // Locks interaction during speech
   const { t } = useLanguage();
+  
+  // Ref to track if component is mounted
+  const isMounted = useRef(true);
 
   // Initialize game with 9 random cards
   const startNewGame = useCallback(() => {
@@ -29,7 +32,11 @@ export const ListeningChallengeMode: React.FC<ListeningChallengeModeProps> = ({ 
     setIsProcessing(false);
     
     // Pick first target after a short delay
-    setTimeout(() => pickNextTarget(selected, new Set()), 500);
+    setTimeout(() => {
+      if (isMounted.current) {
+        pickNextTarget(selected, new Set<string>());
+      }
+    }, 500);
   }, []);
 
   const pickNextTarget = (cards: WordCard[], done: Set<string>) => {
@@ -47,9 +54,13 @@ export const ListeningChallengeMode: React.FC<ListeningChallengeModeProps> = ({ 
   };
 
   useEffect(() => {
+    isMounted.current = true;
     startNewGame();
-    // Cleanup speech on unmount
-    return () => window.speechSynthesis.cancel();
+    // Cleanup speech and set mounted flag on unmount
+    return () => {
+      isMounted.current = false;
+      window.speechSynthesis.cancel();
+    };
   }, [startNewGame]);
 
   const handleCardClick = (card: WordCard) => {
@@ -60,17 +71,22 @@ export const ListeningChallengeMode: React.FC<ListeningChallengeModeProps> = ({ 
       setIsProcessing(true); // Lock input
       
       // 1. Mark as completed visually immediately
-      const newCompleted = new Set(completedIds);
+      const newCompleted = new Set<string>(completedIds);
       newCompleted.add(card.id);
       setCompletedIds(newCompleted);
       setIsWrong(false);
 
       // 2. Speak English Word
       speak(card.english, 'en-US', () => {
+        // Check if mounted before proceeding
+        if (!isMounted.current) return;
+
         // 3. AFTER speech finishes, wait a bit then ask next question
         setTimeout(() => {
-           pickNextTarget(activeCards, newCompleted);
-           setIsProcessing(false); // Unlock input
+           if (isMounted.current) {
+             pickNextTarget(activeCards, newCompleted);
+             setIsProcessing(false); // Unlock input
+           }
         }, 1000); // 1 second pause between English word end and next Chinese prompt
       });
       
@@ -78,7 +94,9 @@ export const ListeningChallengeMode: React.FC<ListeningChallengeModeProps> = ({ 
       // Wrong Logic
       setIsWrong(true);
       speak('Try again', 'en-US');
-      setTimeout(() => setIsWrong(false), 800);
+      setTimeout(() => {
+        if (isMounted.current) setIsWrong(false);
+      }, 800);
     }
   };
 
