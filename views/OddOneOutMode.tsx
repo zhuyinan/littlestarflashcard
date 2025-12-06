@@ -77,13 +77,13 @@ export const OddOneOutMode: React.FC<OddOneOutModeProps> = ({ onBack }) => {
         <div className="grid grid-cols-2 gap-4 w-full max-w-lg">
           {options.map((card) => (
             <button
-              key={card.id}
+              key={card.id} // Forces recreation of button to clear hover state
               onClick={() => handleSelect(card)}
               disabled={roundState !== 'playing'}
               className={`
                 h-40 rounded-3xl shadow-[0_6px_0_rgb(0,0,0,0.1)] border-2 border-transparent
                 flex flex-col items-center justify-center gap-2 transition-transform active:translate-y-1 active:shadow-none
-                ${roundState === 'playing' ? 'bg-white hover:bg-purple-50' : ''}
+                ${roundState === 'playing' ? 'bg-white active:bg-purple-50' : ''}
                 ${roundState === 'won' && card.id === oddOne?.id ? 'bg-green-400 text-white border-green-600' : ''}
                 ${roundState === 'won' && card.id !== oddOne?.id ? 'bg-gray-100 opacity-50' : ''}
                 ${roundState === 'lost' && card.id !== oddOne?.id ? 'bg-red-100' : ''}

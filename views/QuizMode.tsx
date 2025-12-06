@@ -67,7 +67,7 @@ export const QuizMode: React.FC<QuizModeProps> = ({ onBack }) => {
       <div className="flex-1 flex flex-col items-center p-4 max-w-2xl mx-auto w-full">
         
         {/* Question Area */}
-        <div className="w-full bg-white rounded-3xl p-8 shadow-xl text-center mb-8 border-b-8 border-gray-100 relative overflow-hidden">
+        <div key={target.id} className="w-full bg-white rounded-3xl p-8 shadow-xl text-center mb-8 border-b-8 border-gray-100 relative overflow-hidden animate-fade-in">
           <div className="text-gray-400 font-bold text-sm uppercase tracking-widest mb-2">Find the English for</div>
           <div className="text-5xl font-bold text-dark">{target.chinese}</div>
           
@@ -88,13 +88,14 @@ export const QuizMode: React.FC<QuizModeProps> = ({ onBack }) => {
         <div className="grid grid-cols-2 gap-4 w-full">
           {options.map((option) => (
             <button
-              key={option.id}
+              key={option.id} // Essential for clearing hover state on touch devices
               onClick={() => handleOptionClick(option)}
               disabled={status !== 'playing'}
               className={`
                 h-32 rounded-2xl shadow-md text-2xl font-bold transition-all transform
                 flex flex-col items-center justify-center
-                ${status !== 'playing' && option.id === target.id ? 'bg-green-500 text-white scale-105' : 'bg-white text-dark hover:bg-blue-50 active:scale-95'}
+                active:scale-95 active:bg-blue-100
+                ${status !== 'playing' && option.id === target.id ? 'bg-green-500 text-white scale-105' : 'bg-white text-dark'}
                 ${status === 'wrong' && option.id !== target.id ? 'opacity-50' : ''}
               `}
             >

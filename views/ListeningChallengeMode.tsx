@@ -132,7 +132,11 @@ export const ListeningChallengeMode: React.FC<ListeningChallengeModeProps> = ({ 
         <div className="h-full w-full grid grid-cols-3 grid-rows-3 gap-2 md:gap-4">
           {activeCards.map((card) => {
             const isCompleted = completedIds.has(card.id);
-            const textSizeClass = getFontSize(card.english).replace('text-6xl', 'text-2xl md:text-4xl').replace('text-5xl', 'text-xl md:text-3xl').replace('text-4xl', 'text-lg md:text-2xl');
+            // Modified font sizing logic: consistently large
+            // Default: text-2xl (mobile), text-4xl (tablet)
+            // Long words (>9 chars): text-lg (mobile), text-3xl (tablet)
+            const isLong = card.english.length > 9;
+            const textSizeClass = isLong ? 'text-lg md:text-3xl' : 'text-2xl md:text-4xl';
 
             return (
               <button
@@ -141,7 +145,7 @@ export const ListeningChallengeMode: React.FC<ListeningChallengeModeProps> = ({ 
                 disabled={isCompleted || gameWon || isProcessing}
                 className={`
                   relative rounded-2xl shadow-[0_4px_0_rgba(0,0,0,0.1)] font-bold 
-                  flex items-center justify-center text-center transition-all duration-300 w-full h-full break-words px-1
+                  flex items-center justify-center text-center transition-all duration-300 w-full h-full break-words px-1 leading-tight
                   ${textSizeClass}
                   ${isCompleted 
                     ? 'opacity-0 pointer-events-none scale-50' 
