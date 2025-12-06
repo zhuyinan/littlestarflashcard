@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { WordCard } from '../types';
 import { speak } from '../utils';
 import { Volume2, RotateCw } from 'lucide-react';
+import { useLanguage } from '../i18n';
 
 interface FlashcardProps {
   card: WordCard;
@@ -17,6 +18,7 @@ export const getFontSize = (text: string) => {
 
 export const Flashcard: React.FC<FlashcardProps> = ({ card, onNext }) => {
   const [isFlipped, setIsFlipped] = useState(false);
+  const { t } = useLanguage();
 
   // Reset flip state when card changes
   useEffect(() => {
@@ -54,7 +56,7 @@ export const Flashcard: React.FC<FlashcardProps> = ({ card, onNext }) => {
                 <Volume2 size={32} />
               </button>
               <div className="absolute bottom-4 text-gray-400 text-sm flex items-center gap-1">
-                <RotateCw size={16} /> Tap to flip
+                <RotateCw size={16} /> {t.flashcards.tapToFlip}
               </div>
             </div>
           </div>

@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { GameHeader } from '../components/GameHeader';
 import { VOCABULARY } from '../data';
 import { WordCard } from '../types';
 import { shuffleArray, speak } from '../utils';
 import { RefreshCw, Trophy, Volume2 } from 'lucide-react';
-import { getFontSize } from '../components/Flashcard';
+import { useLanguage } from '../i18n';
 
 interface ListeningChallengeModeProps {
   onBack: () => void;
@@ -17,6 +17,7 @@ export const ListeningChallengeMode: React.FC<ListeningChallengeModeProps> = ({ 
   const [isWrong, setIsWrong] = useState(false);
   const [gameWon, setGameWon] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false); // Locks interaction during speech
+  const { t } = useLanguage();
 
   // Initialize game with 9 random cards
   const startNewGame = useCallback(() => {
@@ -89,7 +90,7 @@ export const ListeningChallengeMode: React.FC<ListeningChallengeModeProps> = ({ 
 
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-pink-50">
-      <GameHeader title="Listen & Find" onBack={onBack} color="bg-pink-500" />
+      <GameHeader title={t.menu.listening.title} onBack={onBack} color="bg-pink-500" />
 
       {/* Control / Status Area - Fixed Height */}
       <div className="flex-none p-2 md:p-4 flex flex-col items-center justify-center gap-2">
@@ -107,7 +108,7 @@ export const ListeningChallengeMode: React.FC<ListeningChallengeModeProps> = ({ 
             </div>
             {isWrong && (
               <div className="absolute inset-0 bg-red-100/95 rounded-2xl flex items-center justify-center text-red-500 font-bold text-xl animate-shake z-10">
-                Try again!
+                {t.listening.tryAgain}
               </div>
             )}
           </div>
@@ -116,12 +117,12 @@ export const ListeningChallengeMode: React.FC<ListeningChallengeModeProps> = ({ 
         {gameWon && (
            <div className="bg-white rounded-2xl p-6 shadow-lg w-full max-w-md text-center">
              <Trophy className="mx-auto text-yellow-400 mb-2" size={48} />
-             <div className="text-3xl font-bold text-green-500 mb-4">All Cleared!</div>
+             <div className="text-3xl font-bold text-green-500 mb-4">{t.listening.allCleared}</div>
              <button 
               onClick={startNewGame}
               className="bg-pink-500 text-white px-6 py-3 rounded-xl font-bold hover:bg-pink-600 shadow-md flex items-center gap-2 mx-auto"
              >
-               <RefreshCw size={20} /> Play Again
+               <RefreshCw size={20} /> {t.listening.playAgain}
              </button>
            </div>
         )}
@@ -132,11 +133,11 @@ export const ListeningChallengeMode: React.FC<ListeningChallengeModeProps> = ({ 
         <div className="h-full w-full grid grid-cols-3 grid-rows-3 gap-2 md:gap-4">
           {activeCards.map((card) => {
             const isCompleted = completedIds.has(card.id);
-            // Modified font sizing logic: consistently large
-            // Default: text-2xl (mobile), text-4xl (tablet)
-            // Long words (>9 chars): text-lg (mobile), text-3xl (tablet)
             const isLong = card.english.length > 9;
-            const textSizeClass = isLong ? 'text-lg md:text-3xl' : 'text-2xl md:text-4xl';
+            // Updated font sizing: Generally larger
+            // Base: text-3xl (Mobile), text-5xl (Tablet)
+            // Long: text-xl (Mobile), text-4xl (Tablet)
+            const textSizeClass = isLong ? 'text-xl md:text-4xl' : 'text-3xl md:text-5xl';
 
             return (
               <button
@@ -162,7 +163,7 @@ export const ListeningChallengeMode: React.FC<ListeningChallengeModeProps> = ({ 
       
       {/* Footer info */}
       <div className="flex-none p-2 text-center text-gray-400 font-bold text-sm">
-         Remaining: {9 - completedIds.size}
+         {t.common.remaining}: {9 - completedIds.size}
       </div>
     </div>
   );

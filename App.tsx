@@ -6,9 +6,10 @@ import { OddOneOutMode } from './views/OddOneOutMode';
 import { SentenceBuilderMode } from './views/SentenceBuilderMode';
 import { ListeningChallengeMode } from './views/ListeningChallengeMode';
 import { SentenceChallengeMode } from './views/SentenceChallengeMode';
-import { BookOpen, Gamepad2, BrainCircuit, PenTool, Star, Ear, MessageCircle } from 'lucide-react';
+import { BookOpen, Gamepad2, BrainCircuit, PenTool, Star, Ear, MessageCircle, Languages } from 'lucide-react';
+import { LanguageProvider, useLanguage } from './i18n';
 
-const App: React.FC = () => {
+const AppContent: React.FC = () => {
   const [mode, setMode] = useState<AppMode>(AppMode.Menu);
 
   const renderMode = () => {
@@ -33,11 +34,25 @@ const App: React.FC = () => {
   return <div className="font-sans antialiased text-dark">{renderMode()}</div>;
 };
 
+const App: React.FC = () => {
+  return (
+    <LanguageProvider>
+      <AppContent />
+    </LanguageProvider>
+  );
+};
+
 interface MainMenuProps {
   onSelect: (mode: AppMode) => void;
 }
 
 const MainMenu: React.FC<MainMenuProps> = ({ onSelect }) => {
+  const { t, language, setLanguage } = useLanguage();
+
+  const toggleLanguage = () => {
+    setLanguage(language === 'en' ? 'zh' : 'en');
+  };
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 md:p-6 relative overflow-hidden bg-sky-50">
       {/* Background decorations */}
@@ -48,63 +63,72 @@ const MainMenu: React.FC<MainMenuProps> = ({ onSelect }) => {
           <Star size={40} fill="currentColor" />
       </div>
 
+      {/* Language Toggle */}
+      <button 
+        onClick={toggleLanguage}
+        className="absolute top-4 right-4 z-20 bg-white p-2 rounded-full shadow-md text-primary font-bold flex items-center gap-2 hover:bg-gray-50 active:scale-95 transition-all"
+      >
+        <Languages size={20} />
+        {language === 'en' ? '中文' : 'English'}
+      </button>
+
       <header className="text-center mb-8 z-10">
         <h1 className="text-5xl md:text-6xl font-black text-primary drop-shadow-[0_4px_0_rgba(0,0,0,0.1)] mb-2 tracking-tight">
-          Little Star
+          {t.appTitle}
         </h1>
-        <p className="text-xl text-secondary font-bold">English Flashcards</p>
+        <p className="text-xl text-secondary font-bold">{t.appSubtitle}</p>
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-2xl z-10">
         <MenuButton 
           icon={<BookOpen size={32} />} 
-          title="Flashcards" 
-          subtitle="Learn words & flip"
+          title={t.menu.flashcards.title}
+          subtitle={t.menu.flashcards.subtitle}
           color="bg-secondary"
           onClick={() => onSelect(AppMode.Flashcards)} 
         />
         <MenuButton 
           icon={<Gamepad2 size={32} />} 
-          title="Word Match" 
-          subtitle="Match CN to EN"
+          title={t.menu.quiz.title}
+          subtitle={t.menu.quiz.subtitle}
           color="bg-accent"
           onClick={() => onSelect(AppMode.Quiz)} 
         />
         
         <MenuButton 
           icon={<Ear size={32} />} 
-          title="Listen & Find" 
-          subtitle="Clear the table!"
+          title={t.menu.listening.title}
+          subtitle={t.menu.listening.subtitle}
           color="bg-pink-500"
           onClick={() => onSelect(AppMode.ListeningChallenge)} 
         />
 
         <MenuButton 
           icon={<MessageCircle size={32} />} 
-          title="Pick & Speak" 
-          subtitle="Make sentences"
+          title={t.menu.pickSpeak.title}
+          subtitle={t.menu.pickSpeak.subtitle}
           color="bg-orange-500"
           onClick={() => onSelect(AppMode.SentenceChallenge)} 
         />
         
         <MenuButton 
           icon={<BrainCircuit size={32} />} 
-          title="Odd One Out" 
-          subtitle="Which is different?"
+          title={t.menu.oddOneOut.title}
+          subtitle={t.menu.oddOneOut.subtitle}
           color="bg-purple-500"
           onClick={() => onSelect(AppMode.OddOneOut)} 
         />
         <MenuButton 
           icon={<PenTool size={32} />} 
-          title="Builder" 
-          subtitle="Word Magnets"
+          title={t.menu.builder.title}
+          subtitle={t.menu.builder.subtitle}
           color="bg-green-500"
           onClick={() => onSelect(AppMode.SentenceBuilder)} 
         />
       </div>
       
       <footer className="mt-8 text-gray-400 text-sm font-medium">
-        Made for Grade 1 Students ❤️
+        {t.footer}
       </footer>
     </div>
   );

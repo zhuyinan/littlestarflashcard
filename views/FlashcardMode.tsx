@@ -4,6 +4,7 @@ import { GameHeader } from '../components/GameHeader';
 import { VOCABULARY } from '../data';
 import { ArrowLeft, ArrowRight, Shuffle } from 'lucide-react';
 import { shuffleArray } from '../utils';
+import { useLanguage } from '../i18n';
 
 interface FlashcardModeProps {
   onBack: () => void;
@@ -12,6 +13,7 @@ interface FlashcardModeProps {
 export const FlashcardMode: React.FC<FlashcardModeProps> = ({ onBack }) => {
   const [cards, setCards] = useState(VOCABULARY);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const { t } = useLanguage();
 
   const handleNext = () => {
     setCurrentIndex((prev) => (prev + 1) % cards.length);
@@ -28,7 +30,7 @@ export const FlashcardMode: React.FC<FlashcardModeProps> = ({ onBack }) => {
 
   return (
     <div className="flex flex-col h-screen bg-sky-100">
-      <GameHeader title="Flashcards" onBack={onBack} color="bg-secondary" />
+      <GameHeader title={t.menu.flashcards.title} onBack={onBack} color="bg-secondary" />
       
       <div className="flex-1 flex flex-col items-center justify-center p-4 gap-8">
         <Flashcard card={cards[currentIndex]} />
@@ -57,7 +59,7 @@ export const FlashcardMode: React.FC<FlashcardModeProps> = ({ onBack }) => {
             onClick={handleShuffle}
             className="flex items-center gap-2 px-6 py-3 bg-primary rounded-xl text-white font-bold shadow-md hover:bg-orange-400"
           >
-            <Shuffle size={20} /> Shuffle Deck
+            <Shuffle size={20} /> {t.common.shuffle}
         </button>
       </div>
     </div>

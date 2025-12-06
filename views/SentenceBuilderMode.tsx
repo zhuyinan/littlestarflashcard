@@ -3,7 +3,8 @@ import { GameHeader } from '../components/GameHeader';
 import { VOCABULARY } from '../data';
 import { WordCard } from '../types';
 import { speak, shuffleArray } from '../utils';
-import { RefreshCcw, Volume2, Trash2, Shuffle } from 'lucide-react';
+import { Volume2, Trash2, Shuffle } from 'lucide-react';
+import { useLanguage } from '../i18n';
 
 interface SentenceBuilderModeProps {
   onBack: () => void;
@@ -12,6 +13,7 @@ interface SentenceBuilderModeProps {
 export const SentenceBuilderMode: React.FC<SentenceBuilderModeProps> = ({ onBack }) => {
   const [bankWords, setBankWords] = useState<WordCard[]>([]);
   const [sentence, setSentence] = useState<WordCard[]>([]);
+  const { t } = useLanguage();
 
   // Function to generate the word bank
   const refreshWordBank = () => {
@@ -56,14 +58,14 @@ export const SentenceBuilderMode: React.FC<SentenceBuilderModeProps> = ({ onBack
 
   return (
     <div className="flex flex-col h-screen bg-green-50">
-      <GameHeader title="Make Sentences" onBack={onBack} color="bg-green-600" />
+      <GameHeader title={t.builder.title} onBack={onBack} color="bg-green-600" />
       
       {/* Workspace Area */}
       <div className="bg-white m-4 p-6 rounded-3xl shadow-inner min-h-[160px] flex flex-col relative border-2 border-green-100 flex-none">
         
         <div className="flex flex-wrap gap-2 items-center min-h-[60px]">
           {sentence.length === 0 && (
-            <span className="text-gray-300 italic text-lg w-full text-center">Tap words below to build a sentence...</span>
+            <span className="text-gray-300 italic text-lg w-full text-center">{t.builder.placeholder}</span>
           )}
           {sentence.map((word, idx) => (
             <button
@@ -93,9 +95,9 @@ export const SentenceBuilderMode: React.FC<SentenceBuilderModeProps> = ({ onBack
       {/* Word Bank */}
       <div className="flex-1 overflow-y-auto p-4 pt-0">
         <div className="flex justify-between items-end mb-2 px-2">
-            <div className="text-sm font-bold text-gray-400 uppercase tracking-widest">Word Bank</div>
-            <button onClick={refreshWordBank} className="text-xs font-bold text-green-600 flex items-center gap-1 bg-green-100 px-2 py-1 rounded-lg">
-                <Shuffle size={12} /> New Words
+            <div className="text-sm font-bold text-gray-400 uppercase tracking-widest">{t.builder.wordBank}</div>
+            <button onClick={refreshWordBank} className="text-xs font-bold text-green-600 flex items-center gap-1 bg-green-100 px-2 py-1 rounded-lg hover:bg-green-200 transition-colors">
+                <Shuffle size={12} /> {t.builder.shuffleWords}
             </button>
         </div>
         
@@ -105,10 +107,10 @@ export const SentenceBuilderMode: React.FC<SentenceBuilderModeProps> = ({ onBack
                     key={word.id}
                     onClick={() => addToSentence(word)}
                     className="
-                      bg-white border border-gray-200 shadow-[0_4px_0_rgba(0,0,0,0.05)] 
-                      px-4 py-3 rounded-xl text-xl font-bold text-dark 
+                      bg-white border-2 border-gray-100 shadow-[0_4px_0_rgba(0,0,0,0.05)] 
+                      px-4 py-3 rounded-2xl text-xl font-bold text-dark 
                       active:scale-95 active:shadow-none active:bg-gray-50 
-                      transition-all min-w-[3rem]
+                      transition-all min-w-[4rem] hover:border-green-200 hover:-translate-y-1
                     "
                 >
                     {word.english}

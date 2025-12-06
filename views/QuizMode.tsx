@@ -4,6 +4,7 @@ import { VOCABULARY } from '../data';
 import { WordCard } from '../types';
 import { shuffleArray, getRandomItem, speak } from '../utils';
 import { Star, RefreshCw } from 'lucide-react';
+import { useLanguage } from '../i18n';
 
 interface QuizModeProps {
   onBack: () => void;
@@ -15,6 +16,7 @@ export const QuizMode: React.FC<QuizModeProps> = ({ onBack }) => {
   const [score, setScore] = useState(0);
   const [status, setStatus] = useState<'playing' | 'correct' | 'wrong'>('playing');
   const [streak, setStreak] = useState(0);
+  const { t } = useLanguage();
 
   const generateQuestion = useCallback(() => {
     const correctCard = getRandomItem(VOCABULARY);
@@ -49,18 +51,18 @@ export const QuizMode: React.FC<QuizModeProps> = ({ onBack }) => {
     }
   };
 
-  if (!target) return <div>Loading...</div>;
+  if (!target) return <div>{t.common.loading}</div>;
 
   return (
     <div className="flex flex-col h-screen bg-yellow-50">
-      <GameHeader title="Word Match" onBack={onBack} color="bg-accent" />
+      <GameHeader title={t.menu.quiz.title} onBack={onBack} color="bg-accent" />
 
       <div className="flex justify-between items-center p-4 px-6 bg-white/50">
         <div className="flex items-center gap-2 text-primary font-bold text-xl">
           <Star className="fill-current" /> {score}
         </div>
         <div className="text-gray-500 font-bold">
-           🔥 Streak: {streak}
+           🔥 {t.common.streak}: {streak}
         </div>
       </div>
 
@@ -68,18 +70,18 @@ export const QuizMode: React.FC<QuizModeProps> = ({ onBack }) => {
         
         {/* Question Area */}
         <div key={target.id} className="w-full bg-white rounded-3xl p-8 shadow-xl text-center mb-8 border-b-8 border-gray-100 relative overflow-hidden animate-fade-in">
-          <div className="text-gray-400 font-bold text-sm uppercase tracking-widest mb-2">Find the English for</div>
+          <div className="text-gray-400 font-bold text-sm uppercase tracking-widest mb-2">{t.quiz.findEnglish}</div>
           <div className="text-5xl font-bold text-dark">{target.chinese}</div>
           
           {/* Feedback Overlay */}
           {status === 'correct' && (
              <div className="absolute inset-0 bg-green-500/90 flex items-center justify-center text-white text-4xl font-bold animate-pulse">
-               Good Job! 🎉
+               {t.quiz.goodJob}
              </div>
           )}
            {status === 'wrong' && (
              <div className="absolute inset-0 bg-red-500/90 flex items-center justify-center text-white text-4xl font-bold">
-               Try Again!
+               {t.quiz.tryAgain}
              </div>
           )}
         </div>
@@ -88,7 +90,7 @@ export const QuizMode: React.FC<QuizModeProps> = ({ onBack }) => {
         <div className="grid grid-cols-2 gap-4 w-full">
           {options.map((option) => (
             <button
-              key={option.id} // Essential for clearing hover state on touch devices
+              key={option.id} // Essential for clearing hover state on touch devices (forces remount)
               onClick={() => handleOptionClick(option)}
               disabled={status !== 'playing'}
               className={`
@@ -106,7 +108,7 @@ export const QuizMode: React.FC<QuizModeProps> = ({ onBack }) => {
         
         {status === 'wrong' && (
             <button onClick={() => setStatus('playing')} className="mt-6 flex items-center gap-2 text-gray-500 bg-white px-4 py-2 rounded-full shadow-sm">
-                <RefreshCw size={16}/> Retry
+                <RefreshCw size={16}/> {t.common.retry}
             </button>
         )}
       </div>

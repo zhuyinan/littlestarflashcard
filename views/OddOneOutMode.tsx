@@ -4,6 +4,7 @@ import { VOCABULARY } from '../data';
 import { WordCard, PartOfSpeech } from '../types';
 import { shuffleArray, speak } from '../utils';
 import { Trophy } from 'lucide-react';
+import { useLanguage } from '../i18n';
 
 interface OddOneOutModeProps {
   onBack: () => void;
@@ -14,6 +15,7 @@ export const OddOneOutMode: React.FC<OddOneOutModeProps> = ({ onBack }) => {
   const [oddOne, setOddOne] = useState<WordCard | null>(null);
   const [score, setScore] = useState(0);
   const [roundState, setRoundState] = useState<'playing' | 'won' | 'lost'>('playing');
+  const { t } = useLanguage();
 
   const generatePuzzle = useCallback(() => {
     // 1. Pick a "Majority" category
@@ -61,17 +63,17 @@ export const OddOneOutMode: React.FC<OddOneOutModeProps> = ({ onBack }) => {
 
   return (
     <div className="flex flex-col h-screen bg-purple-50">
-      <GameHeader title="Odd One Out" onBack={onBack} color="bg-purple-500" />
+      <GameHeader title={t.menu.oddOneOut.title} onBack={onBack} color="bg-purple-500" />
       
       <div className="p-4 text-center">
         <div className="inline-flex items-center gap-2 bg-white px-6 py-2 rounded-full shadow-sm text-purple-600 font-bold">
-           <Trophy size={20} /> Score: {score}
+           <Trophy size={20} /> {t.common.score}: {score}
         </div>
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-center p-4">
         <h2 className="text-xl font-bold text-gray-700 mb-8 text-center">
-            Find the word that doesn't belong!
+            {t.oddOneOut.instruction}
         </h2>
 
         <div className="grid grid-cols-2 gap-4 w-full max-w-lg">
@@ -101,15 +103,15 @@ export const OddOneOutMode: React.FC<OddOneOutModeProps> = ({ onBack }) => {
 
         {roundState === 'won' && (
           <div className="mt-8 text-3xl font-bold text-green-500 animate-bounce">
-            Correct! That is a {oddOne?.pos}!
+            {t.oddOneOut.correctMsg(oddOne?.pos || '')}
           </div>
         )}
         
         {roundState === 'lost' && (
            <div className="mt-8 flex flex-col items-center">
-             <div className="text-xl font-bold text-red-500 mb-4">Oops! Try again.</div>
+             <div className="text-xl font-bold text-red-500 mb-4">{t.oddOneOut.oops}</div>
              <button onClick={() => setRoundState('playing')} className="bg-purple-500 text-white px-6 py-2 rounded-full font-bold">
-               Retry Round
+               {t.oddOneOut.retryRound}
              </button>
            </div>
         )}
